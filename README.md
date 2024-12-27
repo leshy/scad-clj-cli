@@ -24,4 +24,41 @@ nix run github:leshy/scad-clj-cli# test.clj
 nix run github:leshy/scad-clj-cli# test.clj | openscad - -o output.png
 ```
 
+for org-babel:
+``` emacs-lisp
+  (defun org-babel-execute:scadclj (body params)
+    (let* ((output-file (or (cdr (assoc :file params))
+                            (org-babel-temp-file "openscad-" ".png")))
+           (input-file (org-babel-temp-file "scadclj-" ".clj"))
+           (colorscheme (or (cdr (assoc :colorscheme params)) "Starnight"))
+           (size (or (cdr (assoc :size params)) "800,600"))
+           (camera (cdr (assoc :camera params)))
+           (axes (cdr (assoc :axes params)))
+           (viewall (cdr (assoc :viewall params)))
+           (cmd (concat "nix run github:leshy/scad-clj-cli# "
+                        input-file
+                        " | openscad -"   ; Read from stdin
+                        " -o " output-file 
+                        " --colorscheme " colorscheme
+                        " --imgsize " size
+                        " --projection o"
+                        (when camera (concat " --camera " camera))
+                        (when axes " --view axes")
+                        (when viewall " --viewall"))))
+      (with-temp-file input-file
+        (insert body))
+      (org-babel-eval cmd "")
+      (format "[[./%s]]" output-file)))
+
+```
+
+``` org
+#+begin_src scadclj :file cube.png :results file link
+(cube 10 10 10)
+#+end_src
+```
+
+`
+
+`
 
