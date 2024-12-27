@@ -57,8 +57,3 @@ for org-babel:
 (cube 10 10 10)
 #+end_src
 ```
-
-`
-
-`
-
